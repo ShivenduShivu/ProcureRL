@@ -49,6 +49,7 @@ agenticpaygym/test/
 
 # Logs
 *.log
+tmp*/
 
 # OS
 .DS_Store

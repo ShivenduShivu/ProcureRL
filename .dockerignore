@@ -1,0 +1,13 @@
+.git
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+tmp*/
+results/test_plots/
+venv/
+.venv/
+env/
+ENV/
