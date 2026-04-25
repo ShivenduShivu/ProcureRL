@@ -46,6 +46,47 @@ class ProcureRewardEngine:
     PENALTY_TIMEOUT = -0.3
     PENALTY_NO_PRICE_OFFER = -0.1
 
+    def compute_shaped(
+        self,
+        deal_reached: bool,
+        agreed_price: Optional[float],
+        offered_price: Optional[float],
+        buyer_max_price: float,
+        seller_current_price: float,
+        seller_min_price: float,
+        current_round: int,
+        max_rounds: int,
+        timed_out: bool,
+    ) -> RewardBreakdown:
+        """
+        Shaped reward for training. Gives meaningful signal even on
+        non-deal steps. Used in training loop only.
+        """
+        try:
+            return self._compute_shaped_safe(
+                deal_reached=deal_reached,
+                agreed_price=agreed_price,
+                offered_price=offered_price,
+                buyer_max_price=buyer_max_price,
+                seller_current_price=seller_current_price,
+                seller_min_price=seller_min_price,
+                current_round=current_round,
+                max_rounds=max_rounds,
+                timed_out=timed_out,
+            )
+        except Exception:
+            return RewardBreakdown(
+                total=0.0,
+                r_savings=0.0,
+                r_efficiency=0.0,
+                r_compliance=0.0,
+                r_deal_quality=0.0,
+                penalty_constraint=0.0,
+                penalty_timeout=0.0,
+                deal_reached=False,
+                constraint_violated=False,
+            )
+
     def compute(
         self,
         deal_reached: bool,
@@ -185,6 +226,92 @@ class ProcureRewardEngine:
             penalty_timeout=0.0,
             deal_reached=True,
             constraint_violated=constraint_violated,
+        )
+
+    def _compute_shaped_safe(
+        self,
+        deal_reached,
+        agreed_price,
+        offered_price,
+        buyer_max_price,
+        seller_current_price,
+        seller_min_price,
+        current_round,
+        max_rounds,
+        timed_out,
+    ) -> RewardBreakdown:
+        if deal_reached:
+            return self.compute(
+                deal_reached=True,
+                agreed_price=agreed_price,
+                buyer_max_price=buyer_max_price,
+                seller_min_price=seller_min_price,
+                current_round=current_round,
+                max_rounds=max_rounds,
+                timed_out=False,
+            )
+
+        if offered_price is None:
+            return RewardBreakdown(
+                total=-0.5,
+                r_savings=0.0,
+                r_efficiency=0.0,
+                r_compliance=0.0,
+                r_deal_quality=0.0,
+                penalty_constraint=0.0,
+                penalty_timeout=-0.5,
+                deal_reached=False,
+                constraint_violated=False,
+            )
+
+        if offered_price > buyer_max_price:
+            return RewardBreakdown(
+                total=-1.0,
+                r_savings=0.0,
+                r_efficiency=0.0,
+                r_compliance=0.0,
+                r_deal_quality=0.0,
+                penalty_constraint=-1.0,
+                penalty_timeout=0.0,
+                deal_reached=False,
+                constraint_violated=True,
+            )
+
+        price_range = buyer_max_price - seller_min_price
+        if price_range <= 0:
+            positioning_score = 0.0
+        else:
+            normalized = (offered_price - seller_min_price) / price_range
+            normalized = max(0.0, min(1.0, normalized))
+
+            if normalized <= 0.35:
+                positioning_score = normalized / 0.35 * 0.8
+            else:
+                positioning_score = 0.8 * (1.0 - normalized) / 0.65
+
+            positioning_score = max(0.0, min(0.8, positioning_score))
+
+        if max_rounds > 0:
+            efficiency = 1.0 - (current_round / max_rounds)
+        else:
+            efficiency = 0.0
+        efficiency = max(0.0, min(1.0, efficiency))
+
+        timeout_pen = -0.3 if timed_out else 0.0
+
+        total = round(0.6 * positioning_score + 0.2 * efficiency + timeout_pen, 4)
+        total = max(-1.0, min(0.6, total))
+
+        return RewardBreakdown(
+            total=total,
+            r_savings=positioning_score,
+            r_efficiency=efficiency,
+            r_compliance=1.0,
+            r_deal_quality=0.0,
+            penalty_constraint=0.0,
+            penalty_timeout=timeout_pen,
+            deal_reached=False,
+            constraint_violated=False,
         )
 
 

@@ -260,6 +260,22 @@ class ProcureEnvExtended(ProcureEnv):
         self._last_reward_breakdown = breakdown
         return breakdown.total
 
+    def get_shaped_reward(self, offered_price: Optional[float]) -> float:
+        """Call after step() to get shaped training reward."""
+        breakdown = reward_engine.compute_shaped(
+            deal_reached=self.terminated,
+            agreed_price=self.agreed_price,
+            offered_price=offered_price,
+            buyer_max_price=self.config["buyer_max_price"],
+            seller_current_price=self.last_seller_price,
+            seller_min_price=self.config["seller_min_price"],
+            current_round=self.current_round,
+            max_rounds=self.config["max_rounds"],
+            timed_out=self.truncated,
+        )
+        self._last_reward_breakdown = breakdown
+        return breakdown.total
+
     def state(self) -> Dict[str, Any]:
         base_state = super().state()
         base_state.update(
