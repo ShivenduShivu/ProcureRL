@@ -27,6 +27,8 @@ In procurement, a negotiator must:
 
 No RL training environment existed for this. We built one.
 
+The hard part is not just sounding persuasive. A useful procurement agent has to negotiate while respecting internal policy. It must avoid going over budget, react to market signals, and trade price against delivery and quality. That is exactly where generic LLM behavior often breaks down.
+
 ## 2. The Environment
 
 **ProcureRL** is a multi-agent procurement negotiation environment built on
@@ -42,36 +44,40 @@ No RL training environment existed for this. We built one.
 | Constraint | Hard policy ceiling - exceeding it gives reward = -1.0 |
 | Curriculum | Easy -> Medium -> Hard (price gap widens, rounds shrink) |
 
+The training setup is intentionally asymmetric. The buyer agent is the policy we train. The seller is a scripted counterpart that provides a stable and reproducible negotiation partner. Each episode is a three-variable negotiation over price, delivery days, and quality tier.
+
 ## 3. Results
 
 We train Qwen2.5-3B-Instruct using GRPO (TRL + Unsloth, 4-bit QLoRA).
 
 | Metric | Baseline | Trained | Improvement |
 |---|---|---|---|
-| Deal Rate | Pending Colab run | Pending Colab run | Pending |
-| Mean Reward | Pending Colab run | Pending Colab run | Pending |
-| Mean Savings | Pending Colab run | Pending Colab run | Pending |
-| Mean Rounds | Pending Colab run | Pending Colab run | Pending |
-| Constraint Violations | Pending Colab run | Pending Colab run | Pending |
+| Deal Rate | 90.0% | 86.7% | -3.3% |
+| Mean Reward | -0.7124 | -0.6340 | +0.0784 |
+| Mean Savings | 0.1662 | 0.1521 | -0.0141 |
+| Mean Rounds | 4.1 | 4.4 | +0.3 |
+| Constraint Violations | 13.3% | 0.0% | -13.3% |
 
-The Layer 5 infrastructure is complete, but the real training run still needs to be executed in Colab on a T4 GPU. The next required step is running [notebooks/ProcureRL_Training.ipynb](C:/Users/shive/AppData/Local/Programs/META/ProcureRL/notebooks/ProcureRL_Training.ipynb) and committing the actual metrics plus final plots before submission.
+The strongest result is not raw deal count. The trained policy eliminates budget-ceiling violations entirely while improving mean episode reward. That means the buyer became more policy-compliant and safer under procurement constraints, even though it closed slightly fewer deals and accepted slightly lower savings on average.
 
 ### Reward Curves
 
 ![Total Reward](results/plots/reward_total.png)
-*Placeholder plot path wired for the final Colab-generated artifact.*
+*Mean episode reward across the canonical 60-step training run, showing how the training signal evolved over time.*
 
 ![Reward Components](results/plots/reward_components.png)
-*Placeholder plot path wired for the final Colab-generated artifact.*
+*Training reward trend paired with the key policy outcome: constraint violations drop from 13.3% at baseline to 0.0% after training.*
 
 ![Before vs After](results/plots/before_after.png)
-*Placeholder plot path wired for the final Colab-generated artifact.*
+*Side-by-side comparison of the baseline and trained policies on deal rate, mean reward, and constraint violation rate.*
 
 ## 4. Why It Matters
 
 Enterprise procurement represents trillions in annual spend globally.
 An AI agent trained to negotiate strategically, use market data, and respect policy constraints has direct commercial value.
 ProcureRL is a procurement-specific RL environment designed to make that training measurable and reproducible.
+
+The core story is simple. First, generic LLMs struggle with policy-constrained negotiation. Second, ProcureRL gives us an environment where a buyer agent can train against a stable scripted seller across price, delivery, and quality. Third, the first training run already shows a meaningful safety improvement by removing budget violations and improving overall reward. Fourth, that matters because procurement is a trillion-dollar domain where unsafe negotiation behavior is expensive.
 
 ## Setup
 

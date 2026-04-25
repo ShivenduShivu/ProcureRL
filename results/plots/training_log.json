@@ -1,37 +1,50 @@
 [
   {
-    "reward/total": 0.0,
-    "reward/savings": 0.0,
-    "reward/efficiency": 0.1,
-    "reward/compliance": 1.0,
-    "reward/deal_quality": 0.5
+    "step": 5,
+    "reward/total": -0.58
   },
   {
-    "reward/total": 0.1,
-    "reward/savings": 0.05,
-    "reward/efficiency": 0.1,
-    "reward/compliance": 1.0,
-    "reward/deal_quality": 0.5
+    "step": 10,
+    "reward/total": -0.3
   },
   {
-    "reward/total": 0.2,
-    "reward/savings": 0.1,
-    "reward/efficiency": 0.1,
-    "reward/compliance": 1.0,
-    "reward/deal_quality": 0.5
+    "step": 15,
+    "reward/total": -0.965
   },
   {
-    "reward/total": 0.30000000000000004,
-    "reward/savings": 0.15000000000000002,
-    "reward/efficiency": 0.1,
-    "reward/compliance": 1.0,
-    "reward/deal_quality": 0.5
+    "step": 20,
+    "reward/total": -0.79
   },
   {
-    "reward/total": 0.4,
-    "reward/savings": 0.2,
-    "reward/efficiency": 0.1,
-    "reward/compliance": 1.0,
-    "reward/deal_quality": 0.5
+    "step": 25,
+    "reward/total": -0.405
+  },
+  {
+    "step": 30,
+    "reward/total": -0.44
+  },
+  {
+    "step": 35,
+    "reward/total": -0.475
+  },
+  {
+    "step": 40,
+    "reward/total": -0.44
+  },
+  {
+    "step": 45,
+    "reward/total": -0.72
+  },
+  {
+    "step": 50,
+    "reward/total": -0.545
+  },
+  {
+    "step": 55,
+    "reward/total": -0.44
+  },
+  {
+    "step": 60,
+    "reward/total": -0.58
   }
 ]
