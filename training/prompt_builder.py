@@ -37,6 +37,10 @@ def build_prompt(
         f"Seller current price: ${seller_price:.2f}.",
         f"Your budget ceiling: ${budget:.2f} (DO NOT exceed this).",
         f"Market price range: ${market_low:.2f} - ${market_high:.2f}.",
+        f"Strategic target zone: ${market_low * 0.95:.2f} - ${market_high:.2f} "
+        f"(aim to open below this range).",
+        f"Your opening offer should be meaningfully below ${budget:.2f} "
+        f"but realistic relative to market data above.",
     ]
     if competitor is not None:
         context_lines.append(f"Competing supplier quote: ${competitor:.2f}.")
