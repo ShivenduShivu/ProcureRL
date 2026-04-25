@@ -50,6 +50,7 @@ agenticpaygym/test/
 # Logs
 *.log
 tmp*/
+hf_space_deploy/
 
 # OS
 .DS_Store
