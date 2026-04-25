@@ -11,6 +11,7 @@ from agenticpay.envs.registration import (
     registry,
     EnvSpec,
 )
+from agenticpay.envs.reward_engine import ProcureRewardEngine, RewardBreakdown, reward_engine
 
 __all__ = [
     "register",
@@ -19,6 +20,9 @@ __all__ = [
     "pprint_registry",
     "registry",
     "EnvSpec",
+    "ProcureRewardEngine",
+    "RewardBreakdown",
+    "reward_engine",
     "Task1BasicPriceNegotiation",
     "Task2ClosePriceNegotiation",
     "Task3CloseToMarketPriceNegotiation",

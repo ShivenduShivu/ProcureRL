@@ -12,6 +12,7 @@ except ImportError:
     class Environment:
         pass
 
+from agenticpay.envs.reward_engine import reward_engine
 from agenticpay.memory.conversation_memory import ConversationMemory
 
 from .action import BuyerAction
@@ -228,20 +229,17 @@ class ProcureEnv(Environment):
         return float((buyer_price + seller_price) / 2.0)
 
     def _compute_reward(self, deal_reached: bool, buyer_price: Optional[float]) -> float:
-        if not deal_reached:
-            if self.truncated:
-                return -0.5
-            return 0.0
-
-        if self.agreed_price is None:
-            return 0.0
-
-        max_price = float(self.config["buyer_max_price"])
-        if self.agreed_price > max_price:
-            return -1.0
-
-        savings = (max_price - self.agreed_price) / max_price
-        return round(float(savings), 4)
+        breakdown = reward_engine.compute(
+            deal_reached=deal_reached,
+            agreed_price=self.agreed_price,
+            buyer_max_price=self.config["buyer_max_price"],
+            seller_min_price=self.config["seller_min_price"],
+            current_round=self.current_round,
+            max_rounds=self.config["max_rounds"],
+            timed_out=self.truncated,
+        )
+        self._last_reward_breakdown = breakdown
+        return breakdown.total
 
     def state(self) -> Dict[str, Any]:
         market_low, market_high = self._last_market_signal

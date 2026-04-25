@@ -7,6 +7,7 @@ try:
 except ImportError:
     spaces = None
 
+from agenticpay.envs.reward_engine import reward_engine
 from agenticpay.memory.conversation_memory import ConversationMemory
 
 from .action import BuyerAction
@@ -243,24 +244,21 @@ class ProcureEnvExtended(ProcureEnv):
         buyer_quality: Optional[int],
         seller_response: Dict[str, Any],
     ) -> float:
-        if not deal_reached:
-            return -0.5 if self.truncated else 0.0
-
-        if self.agreed_price is None:
-            return 0.0
-
-        max_price = float(self.config["buyer_max_price"])
-        if self.agreed_price > max_price:
-            return -1.0
-
-        savings = (max_price - self.agreed_price) / max_price
-
-        if buyer_delivery is not None and buyer_delivery < seller_response.get("delivery_days", buyer_delivery):
-            savings -= 0.02
-        if buyer_quality is not None and buyer_quality > seller_response.get("quality_tier", buyer_quality):
-            savings -= 0.02
-
-        return round(float(savings), 4)
+        breakdown = reward_engine.compute(
+            deal_reached=deal_reached,
+            agreed_price=self.agreed_price,
+            buyer_max_price=self.config["buyer_max_price"],
+            seller_min_price=self.config["seller_min_price"],
+            current_round=self.current_round,
+            max_rounds=self.config["max_rounds"],
+            timed_out=self.truncated,
+            agreed_delivery_days=seller_response.get("delivery_days"),
+            buyer_max_delivery_days=self._scenario.buyer_max_delivery_days if self._scenario else None,
+            agreed_quality_tier=seller_response.get("quality_tier"),
+            buyer_min_quality_tier=self._scenario.buyer_min_quality_tier if self._scenario else None,
+        )
+        self._last_reward_breakdown = breakdown
+        return breakdown.total
 
     def state(self) -> Dict[str, Any]:
         base_state = super().state()
