@@ -47,6 +47,10 @@ class ProcureEnvExtended(ProcureEnv):
                     "competitor_signal",
                     "has_competitor",
                     "policy_budget_ceiling",
+                    "last_buyer_price",
+                    "seller_concession_amount",
+                    "normalized_budget_gap",
+                    "rounds_remaining_ratio",
                 ]
             )
             return {"type": "dict", "fields": base_fields}
@@ -86,6 +90,10 @@ class ProcureEnvExtended(ProcureEnv):
                 "competitor_signal": spaces.Box(low=0.0, high=base_price_high * 2, shape=(), dtype=float),
                 "has_competitor": spaces.Discrete(2),
                 "policy_budget_ceiling": spaces.Box(low=0.0, high=base_price_high * 2, shape=(), dtype=float),
+                "last_buyer_price": spaces.Box(low=0.0, high=base_price_high * 2, shape=(), dtype=float),
+                "seller_concession_amount": spaces.Box(low=0.0, high=base_price_high * 2, shape=(), dtype=float),
+                "normalized_budget_gap": spaces.Box(low=-10.0, high=10.0, shape=(), dtype=float),
+                "rounds_remaining_ratio": spaces.Box(low=0.0, high=1.0, shape=(), dtype=float),
             }
         )
 
@@ -104,6 +112,19 @@ class ProcureEnvExtended(ProcureEnv):
         seller_quality = 2
         buyer_max_delivery = self._scenario.buyer_max_delivery_days if self._scenario else 21
         buyer_min_quality = self._scenario.buyer_min_quality_tier if self._scenario else 2
+        buyer_max_price = float(self.config["buyer_max_price"])
+        initial_seller_price = float(self.config["initial_seller_price"])
+        max_rounds = self.config["max_rounds"]
+        normalized_budget_gap = (
+            (self.last_seller_price - buyer_max_price) / buyer_max_price
+            if buyer_max_price > 0
+            else 0.0
+        )
+        rounds_remaining_ratio = (
+            (max_rounds - self.current_round) / max_rounds
+            if max_rounds > 0
+            else 0.0
+        )
 
         if seller_response:
             seller_delivery = seller_response.get("delivery_days", seller_delivery)
@@ -114,8 +135,8 @@ class ProcureEnvExtended(ProcureEnv):
             max_rounds=self.config["max_rounds"],
             rounds_remaining=self.config["max_rounds"] - self.current_round,
             seller_last_price=float(self.last_seller_price),
-            buyer_max_price=float(self.config["buyer_max_price"]),
-            initial_seller_price=float(self.config["initial_seller_price"]),
+            buyer_max_price=buyer_max_price,
+            initial_seller_price=initial_seller_price,
             market_signal_low=float(market_low),
             market_signal_high=float(market_high),
             conversation_history=self.memory.get_history(),
@@ -127,7 +148,11 @@ class ProcureEnvExtended(ProcureEnv):
             buyer_min_quality_tier=int(buyer_min_quality),
             competitor_signal=self._last_competitor_signal,
             has_competitor=bool(self._scenario.has_competitor if self._scenario else False),
-            policy_budget_ceiling=float(self.config["buyer_max_price"]),
+            policy_budget_ceiling=buyer_max_price,
+            last_buyer_price=self.last_buyer_price,
+            seller_concession_amount=initial_seller_price - float(self.last_seller_price),
+            normalized_budget_gap=normalized_budget_gap,
+            rounds_remaining_ratio=rounds_remaining_ratio,
         )
         return obs.to_dict()
 
@@ -260,7 +285,11 @@ class ProcureEnvExtended(ProcureEnv):
         self._last_reward_breakdown = breakdown
         return breakdown.total
 
-    def get_shaped_reward(self, offered_price: Optional[float]) -> float:
+    def get_shaped_reward(
+        self,
+        offered_price: Optional[float],
+        action_text: Optional[str] = None,
+    ) -> float:
         """Call after step() to get shaped training reward."""
         breakdown = reward_engine.compute_shaped(
             deal_reached=self.terminated,
@@ -272,6 +301,7 @@ class ProcureEnvExtended(ProcureEnv):
             current_round=self.current_round,
             max_rounds=self.config["max_rounds"],
             timed_out=self.truncated,
+            action_text=action_text,
         )
         self._last_reward_breakdown = breakdown
         return breakdown.total

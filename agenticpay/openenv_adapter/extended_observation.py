@@ -20,6 +20,10 @@ class ExtendedNegotiationObservation(NegotiationObservation):
 
     # Compliance
     policy_budget_ceiling: float = 120.0
+    last_buyer_price: Optional[float] = None
+    seller_concession_amount: float = 0.0
+    normalized_budget_gap: float = 0.0
+    rounds_remaining_ratio: float = 1.0
 
     def to_dict(self) -> Dict[str, Any]:
         base = super().to_dict()
@@ -32,6 +36,10 @@ class ExtendedNegotiationObservation(NegotiationObservation):
                 "competitor_signal": self.competitor_signal,
                 "has_competitor": self.has_competitor,
                 "policy_budget_ceiling": self.policy_budget_ceiling,
+                "last_buyer_price": self.last_buyer_price,
+                "seller_concession_amount": self.seller_concession_amount,
+                "normalized_budget_gap": self.normalized_budget_gap,
+                "rounds_remaining_ratio": self.rounds_remaining_ratio,
             }
         )
         return base

@@ -57,6 +57,7 @@ class ProcureRewardEngine:
         current_round: int,
         max_rounds: int,
         timed_out: bool,
+        action_text: Optional[str] = None,
     ) -> RewardBreakdown:
         """
         Shaped reward for training. Gives meaningful signal even on
@@ -73,6 +74,7 @@ class ProcureRewardEngine:
                 current_round=current_round,
                 max_rounds=max_rounds,
                 timed_out=timed_out,
+                action_text=action_text,
             )
         except Exception:
             return RewardBreakdown(
@@ -239,7 +241,16 @@ class ProcureRewardEngine:
         current_round,
         max_rounds,
         timed_out,
+        action_text,
     ) -> RewardBreakdown:
+        import re
+
+        format_ok = (
+            action_text is not None
+            and bool(re.search(r"<BUYER_PRICE>[\d.]+</BUYER_PRICE>", action_text))
+        )
+        format_bonus = 0.05 if format_ok else -0.05
+
         if deal_reached:
             return self.compute(
                 deal_reached=True,
@@ -277,17 +288,19 @@ class ProcureRewardEngine:
                 constraint_violated=True,
             )
 
-        price_range = buyer_max_price - seller_min_price
-        if price_range <= 0:
+        negotiation_range = buyer_max_price - seller_min_price
+        if negotiation_range <= 0:
             positioning_score = 0.0
         else:
-            normalized = (offered_price - seller_min_price) / price_range
-            normalized = max(0.0, min(1.0, normalized))
+            normalized_pos = (offered_price - seller_min_price) / negotiation_range
+            normalized_pos = max(0.0, min(1.0, normalized_pos))
 
-            if normalized <= 0.35:
-                positioning_score = normalized / 0.35 * 0.8
+            if normalized_pos < 0.05:
+                positioning_score = 0.1
+            elif normalized_pos <= 0.35:
+                positioning_score = 0.1 + (normalized_pos - 0.05) / 0.30 * 0.7
             else:
-                positioning_score = 0.8 * (1.0 - normalized) / 0.65
+                positioning_score = 0.8 * (1.0 - normalized_pos) / 0.65
 
             positioning_score = max(0.0, min(0.8, positioning_score))
 
@@ -299,8 +312,11 @@ class ProcureRewardEngine:
 
         timeout_pen = -0.3 if timed_out else 0.0
 
-        total = round(0.6 * positioning_score + 0.2 * efficiency + timeout_pen, 4)
-        total = max(-1.0, min(0.6, total))
+        total = round(
+            0.6 * positioning_score + 0.2 * efficiency + format_bonus + timeout_pen,
+            4,
+        )
+        total = max(-1.0, min(0.85, total))
 
         return RewardBreakdown(
             total=total,
