@@ -64,6 +64,11 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/favicon.ico")
+def favicon():
+    return ""
+
+
 @app.post("/reset", response_model=SessionResponse)
 def reset(request: ResetRequest):
     session_id = str(uuid.uuid4())
