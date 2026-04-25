@@ -1,0 +1,47 @@
+name: ProcureRL
+version: '0.1.0'
+description: >
+  Multi-agent procurement negotiation RL environment.
+  Trains an LLM buyer agent to negotiate price, delivery, and quality
+  against a scripted seller under procurement policy constraints.
+  Built on AgenticPay. Submitted to Meta OpenEnv Hackathon 2026.
+author: ProcureRL Team
+license: MIT
+
+environment:
+  id: ProcureRL-v0
+  entry_point: agenticpay.openenv_adapter.procure_env:ProcureEnv
+  max_episode_steps: 10
+  reward_threshold: 0.15
+
+tools:
+  - name: negotiate
+    description: Submit a buyer negotiation message and receive seller response and reward
+    input_schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Buyer negotiation message in natural language
+      required: [message]
+
+curriculum:
+  stages:
+    - name: easy
+      config:
+        initial_seller_price: 130.0
+        seller_min_price: 95.0
+        buyer_max_price: 120.0
+        max_rounds: 10
+    - name: medium
+      config:
+        initial_seller_price: 150.0
+        seller_min_price: 100.0
+        buyer_max_price: 120.0
+        max_rounds: 8
+    - name: hard
+      config:
+        initial_seller_price: 180.0
+        seller_min_price: 110.0
+        buyer_max_price: 120.0
+        max_rounds: 6
