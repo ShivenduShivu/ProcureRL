@@ -1,3 +1,13 @@
+---
+title: ProcureRL
+emoji: "📦"
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # ProcureRL - Procurement Negotiation RL Environment
 
 [![HuggingFace Space](https://img.shields.io/badge/HuggingFace-Space-yellow)](https://huggingface.co/spaces/ShivenduShivu/ProcureRL)
