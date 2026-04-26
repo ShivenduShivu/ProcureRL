@@ -129,7 +129,7 @@ class ProcureEnvExtended(ProcureEnv):
         )
         seller_concession_amount = initial_seller_price - float(self.last_seller_price)
         seller_concession_rate = (
-            seller_concession_amount / initial_seller_price
+            max(0.0, seller_concession_amount / initial_seller_price)
             if initial_seller_price > 0
             else 0.0
         )

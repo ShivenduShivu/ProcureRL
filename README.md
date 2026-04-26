@@ -10,12 +10,12 @@ pinned: false
 
 # ProcureRL - Procurement Negotiation RL Environment
 
-[![HuggingFace Space](https://img.shields.io/badge/HuggingFace-Space-yellow)](https://huggingface.co/spaces/ShivenduShivu/ProcureRL)
+[![HuggingFace Space](https://img.shields.io/badge/HuggingFace-Space-yellow)](https://huggingface.co/spaces/StarWarrior24x7/ProcureRL)
 [![OpenEnv Compatible](https://img.shields.io/badge/OpenEnv-Compatible-blue)](https://github.com/meta-pytorch/OpenEnv)
 
 ## Meta OpenEnv Hackathon 2026 Submission
 
-**[Live Environment on HuggingFace Spaces](https://huggingface.co/spaces/ShivenduShivu/ProcureRL)**
+**[Live Environment on HuggingFace Spaces](https://huggingface.co/spaces/StarWarrior24x7/ProcureRL)**
 
 **[Demo Video (< 2 min)](https://youtube.com/YOUR_VIDEO_LINK)**
 
