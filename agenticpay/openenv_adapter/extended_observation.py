@@ -22,6 +22,7 @@ class ExtendedNegotiationObservation(NegotiationObservation):
     policy_budget_ceiling: float = 120.0
     last_buyer_price: Optional[float] = None
     seller_concession_amount: float = 0.0
+    seller_concession_rate: float = 0.0
     normalized_budget_gap: float = 0.0
     rounds_remaining_ratio: float = 1.0
 
@@ -38,6 +39,7 @@ class ExtendedNegotiationObservation(NegotiationObservation):
                 "policy_budget_ceiling": self.policy_budget_ceiling,
                 "last_buyer_price": self.last_buyer_price,
                 "seller_concession_amount": self.seller_concession_amount,
+                "seller_concession_rate": self.seller_concession_rate,
                 "normalized_budget_gap": self.normalized_budget_gap,
                 "rounds_remaining_ratio": self.rounds_remaining_ratio,
             }

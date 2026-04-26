@@ -49,6 +49,7 @@ class ProcureEnvExtended(ProcureEnv):
                     "policy_budget_ceiling",
                     "last_buyer_price",
                     "seller_concession_amount",
+                    "seller_concession_rate",
                     "normalized_budget_gap",
                     "rounds_remaining_ratio",
                 ]
@@ -92,6 +93,7 @@ class ProcureEnvExtended(ProcureEnv):
                 "policy_budget_ceiling": spaces.Box(low=0.0, high=base_price_high * 2, shape=(), dtype=float),
                 "last_buyer_price": spaces.Box(low=0.0, high=base_price_high * 2, shape=(), dtype=float),
                 "seller_concession_amount": spaces.Box(low=0.0, high=base_price_high * 2, shape=(), dtype=float),
+                "seller_concession_rate": spaces.Box(low=0.0, high=1.0, shape=(), dtype=float),
                 "normalized_budget_gap": spaces.Box(low=-10.0, high=10.0, shape=(), dtype=float),
                 "rounds_remaining_ratio": spaces.Box(low=0.0, high=1.0, shape=(), dtype=float),
             }
@@ -125,6 +127,12 @@ class ProcureEnvExtended(ProcureEnv):
             if max_rounds > 0
             else 0.0
         )
+        seller_concession_amount = initial_seller_price - float(self.last_seller_price)
+        seller_concession_rate = (
+            seller_concession_amount / initial_seller_price
+            if initial_seller_price > 0
+            else 0.0
+        )
 
         if seller_response:
             seller_delivery = seller_response.get("delivery_days", seller_delivery)
@@ -150,7 +158,8 @@ class ProcureEnvExtended(ProcureEnv):
             has_competitor=bool(self._scenario.has_competitor if self._scenario else False),
             policy_budget_ceiling=buyer_max_price,
             last_buyer_price=self.last_buyer_price,
-            seller_concession_amount=initial_seller_price - float(self.last_seller_price),
+            seller_concession_amount=seller_concession_amount,
+            seller_concession_rate=seller_concession_rate,
             normalized_budget_gap=normalized_budget_gap,
             rounds_remaining_ratio=rounds_remaining_ratio,
         )

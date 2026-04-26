@@ -296,13 +296,18 @@ class ProcureRewardEngine:
             normalized_pos = max(0.0, min(1.0, normalized_pos))
 
             if normalized_pos < 0.05:
-                positioning_score = 0.1
-            elif normalized_pos <= 0.35:
-                positioning_score = 0.1 + (normalized_pos - 0.05) / 0.30 * 0.7
+                positioning_score = 0.05
+            elif normalized_pos <= 0.20:
+                positioning_score = 0.05 + (normalized_pos - 0.05) / 0.15 * 0.75
+            elif normalized_pos <= 0.50:
+                positioning_score = 0.80 - (normalized_pos - 0.20) / 0.30 * 0.50
             else:
-                positioning_score = 0.8 * (1.0 - normalized_pos) / 0.65
+                positioning_score = 0.30 - (normalized_pos - 0.50) / 0.50 * 0.30
 
-            positioning_score = max(0.0, min(0.8, positioning_score))
+            positioning_score = max(0.0, min(0.80, positioning_score))
+
+        concession_potential = max(0.0, (buyer_max_price - offered_price) / buyer_max_price)
+        concession_potential = min(0.15, concession_potential * 0.15)
 
         if max_rounds > 0:
             efficiency = 1.0 - (current_round / max_rounds)
@@ -313,10 +318,14 @@ class ProcureRewardEngine:
         timeout_pen = -0.3 if timed_out else 0.0
 
         total = round(
-            0.6 * positioning_score + 0.2 * efficiency + format_bonus + timeout_pen,
+            0.55 * positioning_score
+            + 0.20 * efficiency
+            + 0.10 * concession_potential
+            + format_bonus
+            + timeout_pen,
             4,
         )
-        total = max(-1.0, min(0.85, total))
+        total = max(-1.0, min(0.90, total))
 
         return RewardBreakdown(
             total=total,
