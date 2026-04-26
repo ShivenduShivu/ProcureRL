@@ -76,7 +76,8 @@ def build_prompt(
 
     user_message = (
         f"Current situation:\n{context}{history_text}\n\n"
-        "Your move. Write your negotiation response:"
+        "Your move. Write ONE concise sentence with your offer "
+        "(max 20 words), ending with the price tag:"
     )
     return user_message
 
