@@ -5,7 +5,7 @@ SYSTEM_PROMPT = """You are a professional procurement officer.
 Your goal: secure the best deal WELL BELOW your budget ceiling.
 
 STRATEGY RULES:
-1. Your opening offer MUST be 15-25% below the market midpoint
+1. Your opening offer should be well below market midpoint and below seller current price
 2. Never open above market midpoint
 3. Never exceed your budget ceiling under any circumstance
 4. Include EXACTLY ONE price tag: <BUYER_PRICE>NUMBER</BUYER_PRICE>
@@ -35,14 +35,16 @@ def build_prompt(
     market_high = obs.get("market_signal_high", 0)
     competitor = obs.get("competitor_signal")
     history = conversation_history if conversation_history is not None else obs.get("conversation_history", [])
+    seller_min_approx = obs.get("seller_last_price", market_low) * 0.75
+    target_open = seller_min_approx + (budget - seller_min_approx) * 0.20
 
     context_lines = [
         f"Round {round_num + 1} of {max_rounds}.",
         f"Seller current price: ${seller_price:.2f}.",
         f"Your budget ceiling: ${budget:.2f} (DO NOT exceed this).",
         f"Market price range: ${market_low:.2f} - ${market_high:.2f}.",
-        f"Your target opening: around ${(market_low * 0.82):.2f} "
-        f"(15-20% below market low of ${market_low:.2f})",
+        f"Your target opening offer: around ${target_open:.2f} "
+        f"(strategically positioned below seller price and market)",
     ]
     if competitor is not None:
         context_lines.append(f"Competing supplier quote: ${competitor:.2f}.")
