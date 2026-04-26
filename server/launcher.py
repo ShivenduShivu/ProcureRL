@@ -174,8 +174,8 @@ LANDING_PAGE = """<!doctype html>
       </div>
       <div class="actions">
         <a class="action primary" href="/health">Check health</a>
-        <a class="action secondary" href="https://github.com/ShivenduShivu/ProcureRL">GitHub repo</a>
-        <a class="action secondary" href="https://colab.research.google.com/drive/1E3w2Uac9HYaPov4_lOiFdqVxk7lMlb1e?usp=sharing">Training notebook</a>
+        <a class="action secondary" href="https://github.com/ShivenduShivu/ProcureRL" target="_blank" rel="noopener noreferrer">GitHub repo</a>
+        <a class="action secondary" href="https://colab.research.google.com/drive/1E3w2Uac9HYaPov4_lOiFdqVxk7lMlb1e?usp=sharing" target="_blank" rel="noopener noreferrer">Training notebook</a>
       </div>
       <p class="footer">
         The root page is a human-friendly landing page. Judges and clients can still call the JSON
