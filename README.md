@@ -17,11 +17,9 @@ pinned: false
 
 **[Live Environment on HuggingFace Spaces](https://huggingface.co/spaces/StarWarrior24x7/ProcureRL)**
 
-**[Demo Video (< 2 min)](https://youtube.com/YOUR_VIDEO_LINK)**
+**[Hackathon Blog Post](https://huggingface.co/spaces/StarWarrior24x7/ProcureRL/blob/main/BLOG.md)**
 
-**[HuggingFace Blog Post](https://huggingface.co/blog/YOUR_POST)**
-
-**[Training Notebook (Colab)](https://colab.research.google.com/github/ShivenduShivu/ProcureRL/blob/main/notebooks/ProcureRL_Training.ipynb)**
+**[Training Notebook (Colab)](https://colab.research.google.com/drive/1E3w2Uac9HYaPov4_lOiFdqVxk7lMlb1e?usp=sharing)**
 
 ---
 
